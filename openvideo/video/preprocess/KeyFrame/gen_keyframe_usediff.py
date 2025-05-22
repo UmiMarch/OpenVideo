@@ -1,10 +1,11 @@
-import cv2
 import os
+import cv2
 import argparse
 import multiprocessing
-from multiprocessing import cpu_count
-from itertools import repeat
 from tqdm import tqdm
+from itertools import repeat
+from multiprocessing import cpu_count
+
 
 def extract_keyframes_usediff(video_path, output_dir, image_diff_threshold=50, pixel_change_ratio_threshold = 0.3):
     if not os.path.exists(output_dir):

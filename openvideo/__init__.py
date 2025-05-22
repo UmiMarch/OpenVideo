@@ -9,5 +9,5 @@ from .video import MixkitVideoFetch, PexelsAPI, PexelsVdieoFetch, PixabayVideoFe
 from .video import VideoMonitor, VideoData, VideoDataset
 
 
-__version__ = "0.0.1a2"
+__version__ = "0.0.1"
 __author__ = "heatingma"
