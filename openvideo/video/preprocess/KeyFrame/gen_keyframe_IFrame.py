@@ -1,18 +1,14 @@
-import cv2
 import os
-import argparse
-import multiprocessing
-from multiprocessing import cpu_count
-from multiprocessing import  Process
-from multiprocessing import cpu_count
-from itertools import repeat
-from tqdm import tqdm
 import math
-from glob import glob
-import pathlib
-
-import subprocess
 import shlex
+import pathlib
+import subprocess
+import multiprocessing
+from tqdm import tqdm
+from glob import glob
+from itertools import repeat
+from multiprocessing import cpu_count, Process
+
 
 def extract_keyframes_use_iframe(videos_dirs,sub_list):
     """
@@ -76,11 +72,8 @@ def extract_keyframes_with_progress_update(args):
 def process_videos_parallel(videos_dirs):
     data_list = os.listdir(videos_dirs)
     n_processes = cpu_count()
-
-    import multiprocessing
-    # multiprocessing.set_start_method('spawn')
-
     processes_list = []
+    
     for n in range(n_processes):
         size = math.ceil(len(data_list) / n_processes)
         sub_list = data_list[n * size: min((n + 1) * size, len(data_list))]
@@ -92,16 +85,3 @@ def process_videos_parallel(videos_dirs):
         p.start()
     for p in processes_list:
         p.join()
-
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="generate keyframe use diff")
-    parser.add_argument("--videos_dirs", type=str, default=r'pexels-video')
-    # parser.add_argument("--output_keyframe_dir", type=str, default=r'pexels-video-keyframe')
-    args = parser.parse_args()
-    process_videos_parallel(args.videos_dirs)
-    
-# Usage:
-# python gen_keyframe_IFrame.py --input_video_dir input_video_dir --output_keyframe_dir output_keyframe_dir
-

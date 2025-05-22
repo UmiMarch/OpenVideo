@@ -1,13 +1,17 @@
 import os
 import cv2
-import argparse
 import multiprocessing
 from tqdm import tqdm
 from itertools import repeat
 from multiprocessing import cpu_count
 
 
-def extract_keyframes_usediff(video_path, output_dir, image_diff_threshold=50, pixel_change_ratio_threshold = 0.3):
+def extract_keyframes_usediff(
+    video_path: str, 
+    output_dir: str, 
+    image_diff_threshold: int = 50, 
+    pixel_change_ratio_threshold: float = 0.3
+):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -58,11 +62,12 @@ def extract_keyframes_usediff(video_path, output_dir, image_diff_threshold=50, p
 
     cap.release()
 
-def get_video_files(directory):
-    # return [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(('.mp4', '.avi', '.mkv'))]
+
+def get_video_files(directory: str):
     return [os.path.join(directory, f) for f in os.listdir(directory)]
 
-def process_videos_parallel(directory, output_base_dir):
+
+def process_videos_parallel(directory: str, output_base_dir: str):
     video_files = get_video_files(directory)
 
     num_processes = cpu_count()
@@ -71,8 +76,7 @@ def process_videos_parallel(directory, output_base_dir):
             for _ in pool.imap_unordered(extract_keyframes_with_progress_update, zip(video_files, repeat(output_base_dir))):
                 pbar.update(1)
 
-def extract_keyframes_with_progress_update(args):
-    video_path, output_base_dir = args
+def extract_keyframes_with_progress_update(video_path: str, output_base_dir: str):
     output_dir = os.path.join(output_base_dir, os.path.splitext(os.path.basename(video_path))[0])
     try:
         extract_keyframes_usediff(video_path, output_dir)
@@ -80,15 +84,3 @@ def extract_keyframes_with_progress_update(args):
     except Exception as e:
         print(f"Error processing video {video_path}: {e}")
         return False  # Indicate failure for tqdm update (not used here, but could be useful for logging)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="generate keyframe use diff")
-    parser.add_argument("--input_video_dir", type=str, default=r'pexels-video')
-    parser.add_argument("--output_keyframe_dir", type=str, default=r'pexels-video-keyframe')
-    args = parser.parse_args()
-    process_videos_parallel(args.input_video_dir, args.output_keyframe_dir)
-    
-# Usage:
-# python gen_keyframe_usediff.py --input_video_dir input_video_dir --output_keyframe_dir output_keyframe_dir
-
